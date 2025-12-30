@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eri-labeling-tool
+  labels:
+    app: eri-labeling-tool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eri-labeling-tool
+  template:
+    metadata:
+      labels:
+        app: eri-labeling-tool
+    spec:
+      containers:
+      - name: eri-labeling-tool
+        image: eri-labeling-tool:latest # Replace with your actual image registry path
+        ports:
+        - containerPort: 8501
+        # Mount volume for persistence if needed
+        # volumeMounts:
+        # - mountPath: /app/data
+        #   name: data-volume
+      # volumes:
+      # - name: data-volume
+      #   hostPath:
+      #     path: /data/eri-labeling
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eri-labeling-service
+spec:
+  type: NodePort # Or LoadBalancer if Hetzner integration is set up
+  selector:
+    app: eri-labeling-tool
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8501
+      nodePort: 30001 # Optional: specify a fixed node port
